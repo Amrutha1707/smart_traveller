@@ -1,0 +1,516 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WanderWise | Smart Tour Planner</title>
+<style>
+:root{--navy:#10243b;--blue:#4169e1;--mint:#b8f2df;--ink:#17263d;--muted:#718096;--bg:#f4f7fb;--line:#e7edf4}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0}
+.hidden{display:none!important}
+.eyebrow{font-size:11px;letter-spacing:2px;font-weight:800;color:#7587a4}
+.primary{background:var(--blue);color:white;padding:13px 20px;border-radius:11px;font-weight:750}
+.primary:hover{background:#3156c7}
+.secondary{background:#edf1ff;color:#3555bd;padding:11px 15px;border-radius:10px;font-weight:700}
+.muted{color:var(--muted);font-size:12px;line-height:1.6}
+
+/* FIRST TITLE SCREEN */
+#landing{min-height:100vh;padding:22px;display:grid;place-items:center;background:#0d1e31}
+.landing-shell{width:min(1200px,100%);min-height:650px;border-radius:28px;overflow:hidden;position:relative;display:grid;grid-template-columns:1fr 0.85fr;background:linear-gradient(120deg,#102b48,#245b6d)}
+.landing-shell:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#0b1c30ed,#123751a8),url('https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1600&q=85') center/cover}
+.brand{position:absolute;top:27px;left:30px;z-index:1;color:white;font-size:20px;font-weight:850}
+.brand span{color:var(--mint)}
+.landing-copy{position:relative;z-index:1;align-self:center;color:white;padding:75px 38px 45px}
+.pill{display:inline-block;padding:9px 13px;border:1px solid #ffffff55;background:#ffffff15;border-radius:30px;font-size:11px;letter-spacing:1px}
+.landing-copy h1{font-size:clamp(43px,5.5vw,72px);line-height:1.03;letter-spacing:-2px;margin:24px 0 18px}
+.landing-copy h1 em{font-style:normal;color:var(--mint)}
+.landing-copy p{max-width:430px;line-height:1.8;color:#e0ebf5;font-size:15px}
+.features{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin-top:28px}
+.start-panel{position:relative;z-index:1;align-self:center;margin:35px 30px 35px 0;background:#fffffff0;padding:25px;border-radius:22px;box-shadow:0 25px 70px #06132255}
+.start-panel h2{font-size:23px;margin:8px 0}
+.start-panel>p{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:20px}
+.field{margin-bottom:13px}
+.field label{display:block;font-size:12px;font-weight:800;margin-bottom:7px;color:#34455d}
+.field input,.field select{width:100%;padding:12px;border:1px solid #dbe3ee;border-radius:9px;background:white;outline:none}
+.field input:focus,.field select:focus{border-color:#6381ee}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.start-panel .primary{width:100%;margin-top:5px}
+
+/* DASHBOARD */
+#app{min-height:100vh}
+.topbar{height:68px;background:white;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 25px;position:sticky;top:0;z-index:10}
+.app-brand{font-size:19px;font-weight:850;color:var(--navy)}
+.app-brand span{color:var(--blue)}
+.top-actions{display:flex;align-items:center;gap:12px}
+.avatar{width:35px;height:35px;border-radius:50%;display:grid;place-items:center;background:#e6ecff;color:#3e5dcb;font-weight:800}
+.layout{display:grid;grid-template-columns:220px minmax(0,1fr);max-width:1500px;margin:auto}
+.sidebar{background:white;border-right:1px solid var(--line);padding:24px 13px;min-height:calc(100vh - 68px)}
+.nav-label{font-size:10px;color:#9aa7b9;letter-spacing:1.7px;font-weight:850;padding:10px}
+.navbtn{display:flex;gap:12px;align-items:center;width:100%;text-align:left;padding:12px;border-radius:10px;background:transparent;color:#68768a;font-size:13px;font-weight:700;margin:3px 0}
+.navbtn:hover,.navbtn.active{background:#edf1ff;color:#3e5fd1}
+.nav-icon{width:20px;text-align:center;font-size:17px}
+.sidebar-note{margin:28px 4px;padding:14px;background:#effaf6;border-radius:13px;font-size:12px;line-height:1.7;color:#527469}
+.content{padding:26px;min-width:0}
+.welcome{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:20px}
+.welcome h1{font-size:27px;margin:6px 0}
+.welcome p{font-size:12px;color:var(--muted);margin:0}
+.banner{padding:24px;border-radius:18px;margin-bottom:19px;color:white;background:linear-gradient(100deg,#132e4ef0,#23546bc4),url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=80') center/cover;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.banner h2{margin:8px 0;font-size:24px}
+.banner p{font-size:12px;color:#e1edf6;margin:0}
+.banner-chip{padding:10px 13px;background:#ffffff20;border:1px solid #ffffff40;border-radius:10px;font-size:12px;white-space:nowrap}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:19px}
+.stat,.panel{background:white;border:1px solid var(--line);border-radius:15px;padding:17px}
+.stat-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px}
+.stat-icon{display:grid;place-items:center;width:33px;height:33px;background:#edf1ff;border-radius:10px;font-size:17px}
+.stat strong{display:block;font-size:22px;margin:13px 0 5px}
+.stat small{font-size:10px;color:#7c8ba0}
+.two-col{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);gap:16px;margin-bottom:17px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:15px}
+.panel-head h3{margin:0;font-size:15px}
+.panel-head button{background:transparent;color:#4b65cb;font-size:11px;font-weight:800}
+.cost-row{margin:14px 0}
+.cost-label{display:flex;justify-content:space-between;gap:8px;font-size:12px}
+.cost-label span{color:#68788d}
+.track{height:7px;border-radius:9px;background:#edf1f6;margin-top:8px;overflow:hidden}
+.track div{height:100%;background:linear-gradient(90deg,#4c71e6,#8798ff);border-radius:9px}
+.hotel-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.hotel{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.hotel-photo{height:85px;display:grid;place-items:center;font-size:32px;background:linear-gradient(135deg,#dcebe9,#a8c9c0)}
+.hotel:nth-child(2) .hotel-photo{background:linear-gradient(135deg,#dce4f8,#a5b9df)}
+.hotel:nth-child(3) .hotel-photo{background:linear-gradient(135deg,#f8e8d7,#e4bda0)}
+.hotel-body{padding:10px}
+.hotel h4{font-size:11px;margin:0 0 8px}
+.price{font-size:14px;font-weight:850}
+.hotel small{display:block;font-size:10px;color:var(--muted);line-height:1.5;margin-top:5px}
+.badge{display:inline-block;background:#e4f8ed;color:#19794b;font-size:9px;padding:5px 6px;border-radius:5px;margin-top:8px}
+.place-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.place-card{border:1px solid var(--line);border-radius:12px;padding:12px}
+.place-emoji{font-size:25px;margin-bottom:8px}
+.place-card h4{font-size:12px;margin:0 0 7px}
+.place-card p{font-size:10px;color:var(--muted);line-height:1.6;margin:0}
+.place-card button{background:#edf1ff;color:#4260cc;border-radius:7px;padding:7px;margin-top:10px;font-size:10px;font-weight:750}
+.itinerary-day{display:grid;grid-template-columns:65px 1fr;gap:10px;margin:13px 0}
+.day-chip{background:#edf1ff;color:#3e5cc5;border-radius:10px;padding:12px 5px;text-align:center;font-size:12px;font-weight:850}
+.day-chip small{display:block;font-size:9px;margin-top:5px}
+.event{display:grid;grid-template-columns:65px 1fr;gap:8px;padding:7px 0;border-bottom:1px solid #f0f3f7;font-size:11px}
+.event:last-child{border-bottom:0}
+.event time{color:#73839a}
+.event b{font-size:11px}
+.event small{display:block;color:#7c8ba0;margin-top:3px}
+.crowd-box{background:#fff7ed;border:1px solid #ffdfb9;padding:14px;border-radius:12px;display:flex;gap:10px;align-items:flex-start}
+.crowd-box .big{font-size:24px}
+.crowd-box h4{font-size:12px;color:#9c561b;margin:0 0 5px}
+.crowd-box p{font-size:11px;line-height:1.6;color:#815d3b;margin:0}
+#toast{position:fixed;bottom:20px;right:20px;z-index:20;background:#142c48;color:white;padding:14px 17px;border-radius:11px;box-shadow:0 12px 35px #0d1d3040;font-size:12px;max-width:320px}
+footer{text-align:center;color:#97a4b5;font-size:11px;padding:20px}
+@media(max-width:1000px){
+ .layout{grid-template-columns:180px minmax(0,1fr)}
+ .content{padding:18px}
+ .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .two-col{grid-template-columns:1fr}
+ .landing-shell{grid-template-columns:1fr}
+ .landing-copy{padding:95px 30px 20px}
+ .start-panel{margin:10px 25px 25px;max-width:600px}
+}
+@media(max-width:650px){
+ #landing{padding:9px}
+ .landing-shell{border-radius:18px}
+ .landing-copy{padding:90px 20px 12px}
+ .landing-copy h1{font-size:44px}
+ .start-panel{margin:15px;padding:19px}
+ .topbar{padding:0 14px}
+ .top-caption{display:none}
+ .layout{display:block}
+ .sidebar{min-height:0;display:flex;overflow-x:auto;padding:7px;position:sticky;top:68px;z-index:8}
+ .nav-label,.sidebar-note{display:none}
+ .navbtn{width:auto;white-space:nowrap;padding:10px;margin:0 2px}
+ .nav-icon{display:none}
+ .content{padding:14px}
+ .welcome h1{font-size:22px}
+ .banner{padding:17px;align-items:flex-start;flex-direction:column}
+ .stats{gap:8px}
+ .stat{padding:12px}
+ .stat strong{font-size:19px}
+ .hotel-list{grid-template-columns:1fr}
+ .hotel{display:grid;grid-template-columns:80px 1fr}
+ .hotel-photo{height:100%;min-height:105px}
+ .place-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .form-grid{grid-template-columns:1fr}
+}
+@media print{
+ #landing,.topbar,.sidebar,.primary,.secondary,footer{display:none!important}
+ .layout{display:block}.content{padding:0}
+ .panel,.stat{break-inside:avoid;box-shadow:none}
+}
+</style>
+</head>
+<body>
+
+<!-- FIRST SCREEN -->
+<section id="landing">
+ <div class="landing-shell">
+  <div class="brand">✦ Wander<span>Wise</span></div>
+  <div class="landing-copy">
+   <div class="pill">✧ YOUR JOURNEY, REIMAGINED</div>
+   <h1>Go places.<br><em>Not over</em><br>budget.</h1>
+   <p>Your personal travel planner turns your budget into a thoughtful getaway with affordable stays, places to explore, daily plans and smarter alternatives.</p>
+   <div class="features">
+    <span>✓ Budget-first planning</span>
+    <span>✓ Day-wise itinerary</span>
+    <span>✓ Alternative ideas</span>
+   </div>
+  </div>
+
+  <form class="start-panel" id="startForm">
+   <div class="eyebrow">LET'S MAKE A PLAN</div>
+   <h2>Your next escape ✈</h2>
+   <p>Tell us a little about your trip. Your dashboard will be ready in seconds.</p>
+   <div class="field">
+    <label for="name">Your name</label>
+    <input id="name" placeholder="Your name" value="Amrutha" required>
+   </div>
+   <div class="form-grid">
+    <div class="field">
+     <label for="from">Starting city</label>
+     <input id="from" placeholder="Thanjavur" value="Thanjavur" required>
+    </div>
+    <div class="field">
+     <label for="dest">Destination</label>
+     <input id="dest" placeholder="Ooty" value="Ooty" required>
+    </div>
+    <div class="field">
+     <label for="budget">Total budget (₹)</label>
+     <input id="budget" type="number" min="1000" value="10000" required>
+    </div>
+    <div class="field">
+     <label for="people">Travellers</label>
+     <select id="people">
+      <option value="2">2 people</option>
+      <option value="3">3 people</option>
+      <option value="4" selected>4 · Family</option>
+      <option value="5">5 people</option>
+      <option value="6">6 people</option>
+     </select>
+    </div>
+    <div class="field">
+     <label for="days">Duration</label>
+     <select id="days">
+      <option value="1">1 day</option>
+      <option value="2" selected>2 days / 1 night</option>
+      <option value="3">3 days / 2 nights</option>
+      <option value="4">4 days / 3 nights</option>
+      <option value="5">5 days / 4 nights</option>
+     </select>
+    </div>
+    <div class="field">
+     <label for="travel">Travel style</label>
+     <select id="travel">
+      <option value="bus">Bus / public transport</option>
+      <option value="train">Train</option>
+      <option value="car">Own car</option>
+     </select>
+    </div>
+   </div>
+   <button class="primary" type="submit">Build my trip plan →</button>
+   <div class="muted" style="margin-top:12px;text-align:center;font-size:10px">Prototype · No booking or payment</div>
+  </form>
+ </div>
+</section>
+
+<!-- DASHBOARD SCREEN -->
+<section id="app" class="hidden">
+ <header class="topbar">
+  <div class="app-brand">✦ Wander<span>Wise</span></div>
+  <div class="top-actions">
+   <span class="muted">Your personal travel space</span>
+   <div class="avatar" id="avatar">A</div>
+  </div>
+ </header>
+
+ <div class="layout">
+  <aside class="sidebar">
+   <div class="nav-label">WORKSPACE</div>
+   <button class="navbtn active" data-section="overview"><span class="nav-icon">⌂</span>Overview</button>
+   <button class="navbtn" data-section="budgetSection"><span class="nav-icon">◈</span>Budget Planner</button>
+   <button class="navbtn" data-section="staySection"><span class="nav-icon">⌂</span>Stays & Hotels</button>
+   <button class="navbtn" data-section="placesSection"><span class="nav-icon">◎</span>Explore Places</button>
+   <button class="navbtn" data-section="itinerarySection"><span class="nav-icon">▦</span>My Itinerary</button>
+   <button class="navbtn" data-section="crowdSection"><span class="nav-icon">♧</span>Crowd Watch</button>
+   <div class="sidebar-note">💡 <b>Smart tip</b><br>Keep some money aside for unexpected travel costs.</div>
+  </aside>
+
+  <main class="content">
+   <div id="overview" class="welcome">
+    <div>
+     <div class="eyebrow">YOUR TRAVEL DASHBOARD</div>
+     <h1 id="hello">Ready to wander?</h1>
+     <p>Here's your trip at a glance. Let's make every rupee count.</p>
+    </div>
+    <button class="secondary" id="editTrip">＋ New Plan</button>
+   </div>
+
+   <section class="banner">
+    <div>
+     <div class="eyebrow" style="color:#c8f5e8">YOUR NEXT ADVENTURE</div>
+     <h2 id="bannerDest">A little escape to Ooty</h2>
+     <p id="bannerSub">2 days · 4 travellers · planned around your budget</p>
+    </div>
+    <div class="banner-chip" id="bannerBudget">₹10,000 total budget</div>
+   </section>
+
+   <div class="stats">
+    <div class="stat"><div class="stat-top">Total Budget <span class="stat-icon">₹</span></div><strong id="statBudget">₹10,000</strong><small>Your spending limit</small></div>
+    <div class="stat"><div class="stat-top">Estimated Spend <span class="stat-icon">◈</span></div><strong id="statSpend">₹0</strong><small>Sample cost estimate</small></div>
+    <div class="stat"><div class="stat-top">Places to Explore <span class="stat-icon">⌖</span></div><strong id="statPlaces">4</strong><small>Ideas for your trip</small></div>
+    <div class="stat"><div class="stat-top">Trip Duration <span class="stat-icon">▦</span></div><strong id="statDays">2 days</strong><small id="statPeople">4 travellers</small></div>
+   </div>
+
+   <div class="two-col">
+    <section class="panel" id="budgetSection">
+     <div class="panel-head"><h3>◈ Budget at a Glance</h3><span class="eyebrow">ESTIMATE</span></div>
+     <div id="costRows"></div>
+     <div style="border-top:1px solid var(--line);padding-top:13px;display:flex;justify-content:space-between;font-size:13px"><b>Estimated Total</b><b id="costTotal">₹0</b></div>
+     <p id="budgetNote" class="muted"></p>
+    </section>
+
+    <section class="panel" id="staySection">
+     <div class="panel-head"><h3>⌂ Stay Ideas</h3><button onclick="showToast('These are sample hotel categories. Connect a hotel API for real listings and availability.')">HOW IT WORKS ↗</button></div>
+     <div class="hotel-list" id="hotelList"></div>
+     <p class="muted">Illustrative rates only. Verify actual prices and availability before booking.</p>
+    </section>
+   </div>
+
+   <section class="panel" id="placesSection" style="margin-bottom:17px">
+    <div class="panel-head"><h3>◎ Places Worth Your Time</h3><span class="eyebrow">TRIP IDEAS</span></div>
+    <div class="place-grid" id="placeGrid"></div>
+   </section>
+
+   <div class="two-col">
+    <section class="panel" id="itinerarySection">
+     <div class="panel-head"><h3>▦ Your Day-wise Plan</h3><span class="eyebrow">FLEXIBLE</span></div>
+     <div id="itinerary"></div>
+    </section>
+
+    <section class="panel" id="crowdSection">
+     <div class="panel-head"><h3>♧ Crowd Watch</h3><span class="eyebrow">DEMO ALERT</span></div>
+     <div class="field">
+      <label for="crowd">Try a crowd scenario</label>
+      <select id="crowd">
+       <option value="normal">Normal conditions</option>
+       <option value="busy">Heavy crowd reported</option>
+       <option value="closed">Place temporarily unavailable</option>
+      </select>
+     </div>
+     <div id="crowdResult" class="crowd-box"></div>
+     <p class="muted">Crowd status is simulated, not live data.</p>
+    </section>
+   </div>
+
+   <section class="panel">
+    <div class="panel-head"><h3>✧ Before You Go</h3><button onclick="window.print()">PRINT / SAVE PDF ↗</button></div>
+    <div id="tips" class="muted"></div>
+    <p class="muted">This is a front-end prototype. Prices and times are estimates. Verify official opening hours, route conditions and access before travelling.</p>
+   </section>
+   <footer>WanderWise · Make memories, not overspending.</footer>
+  </main>
+ </div>
+</section>
+
+<div id="toast" class="hidden"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const rupee = n => "₹" + Math.round(n).toLocaleString("en-IN");
+
+const placesData = {
+ ooty: [
+  {name:"Botanical Garden",emoji:"🌿",fee:50,time:"9:00 AM",duration:"1–2 hrs",alt:"Rose Garden"},
+  {name:"Ooty Lake",emoji:"🛶",fee:30,time:"11:00 AM",duration:"1–2 hrs",alt:"Tea Museum"},
+  {name:"Doddabetta Peak",emoji:"⛰️",fee:30,time:"2:30 PM",duration:"1–2 hrs",alt:"Tea Museum"},
+  {name:"Rose Garden",emoji:"🌹",fee:50,time:"8:30 AM",duration:"1 hr",alt:"Botanical Garden"},
+  {name:"Tea Museum",emoji:"🍵",fee:25,time:"3:30 PM",duration:"1 hr",alt:"Ooty Lake"}
+ ],
+ kodaikanal: [
+  {name:"Kodaikanal Lake",emoji:"🛶",fee:0,time:"9:00 AM",duration:"1–2 hrs",alt:"Bryant Park"},
+  {name:"Bryant Park",emoji:"🌷",fee:50,time:"11:00 AM",duration:"1 hr",alt:"Coaker's Walk"},
+  {name:"Coaker's Walk",emoji:"🌄",fee:30,time:"3:00 PM",duration:"1 hr",alt:"Local market"},
+  {name:"Pillar Rocks",emoji:"⛰️",fee:50,time:"8:30 AM",duration:"1–2 hrs",alt:"Bryant Park"},
+  {name:"Silver Cascade Falls",emoji:"💧",fee:0,time:"4:00 PM",duration:"30 mins",alt:"Kodaikanal Lake"}
+ ],
+ chennai: [
+  {name:"Marina Beach",emoji:"🌊",fee:0,time:"6:00 AM",duration:"1 hr",alt:"Elliot's Beach"},
+  {name:"Government Museum",emoji:"🏛️",fee:50,time:"10:00 AM",duration:"2 hrs",alt:"Heritage walk"},
+  {name:"Kapaleeshwarar Temple",emoji:"🛕",fee:0,time:"4:00 PM",duration:"1 hr",alt:"Mylapore streets"},
+  {name:"Elliot's Beach",emoji:"🌅",fee:0,time:"5:00 PM",duration:"1 hr",alt:"Marina Beach"},
+  {name:"Mylapore",emoji:"🏘️",fee:0,time:"11:00 AM",duration:"1 hr",alt:"Government Museum"}
+ ]
+};
+
+let trip = {};
+let currentPlaces = [];
+
+function showToast(message){
+ const toast=$("toast");
+ toast.textContent=message;
+ toast.classList.remove("hidden");
+ clearTimeout(window.toastTimer);
+ window.toastTimer=setTimeout(()=>toast.classList.add("hidden"),3500);
+}
+
+function buildTrip(event){
+ event.preventDefault();
+
+ const budget=Number($("budget").value);
+ if(!Number.isFinite(budget)||budget<1000){
+  alert("Please enter a budget of at least ₹1,000.");
+  return;
+ }
+
+ trip={
+  name:$("name").value.trim()||"Traveller",
+  from:$("from").value.trim(),
+  dest:$("dest").value.trim(),
+  budget,
+  people:Number($("people").value),
+  days:Number($("days").value),
+  travel:$("travel").value
+ };
+
+ currentPlaces=placesData[trip.dest.toLowerCase()]||placesData.ooty;
+
+ $("landing").classList.add("hidden");
+ $("app").classList.remove("hidden");
+ $("avatar").textContent=trip.name.charAt(0).toUpperCase();
+ $("hello").textContent="Ready to wander, "+trip.name+"?";
+ $("bannerDest").textContent="A little escape to "+trip.dest;
+ $("bannerSub").textContent=trip.days+" day"+(trip.days>1?"s":"")+" · "+trip.people+" travellers · from "+trip.from;
+ $("bannerBudget").textContent=rupee(budget)+" total budget";
+
+ const travelRate={bus:350,train:450,car:900}[trip.travel];
+ const costs=[
+  ["Travel · return estimate",travelRate*trip.people],
+  ["Stay · shared rooms",trip.days>1?1800*Math.ceil(trip.people/2)*(trip.days-1):0],
+  ["Food & refreshments",trip.people*350*trip.days],
+  ["Activities & local travel",trip.people*250*trip.days],
+  ["Emergency reserve · 8%",budget*.08]
+ ];
+ const total=costs.reduce((sum,item)=>sum+item[1],0);
+
+ $("statBudget").textContent=rupee(budget);
+ $("statSpend").textContent=rupee(total);
+ $("statPlaces").textContent=currentPlaces.length;
+ $("statDays").textContent=trip.days+" day"+(trip.days>1?"s":"");
+ $("statPeople").textContent=trip.people+" travellers";
+
+ $("costRows").innerHTML=costs.map(([label,value])=>`
+  <div class="cost-row">
+   <div class="cost-label"><span>${label}</span><b>${rupee(value)}</b></div>
+   <div class="track"><div style="width:${Math.min(100,value/budget*100)}%"></div></div>
+  </div>`).join("");
+
+ $("costTotal").textContent=rupee(total);
+ $("budgetNote").textContent=total<=budget
+  ?"✓ This estimate is within your budget. Keep a little extra for surprises."
+  :"⚠ This estimate is "+rupee(total-budget)+" over budget. Consider cheaper transport, fewer nights or fewer activities.";
+
+ const stays=[
+  ["Cosy Guest House","🛏️",1400],
+  ["Family Homestay","🏡",1800],
+  ["Comfort Stay","🏨",2800]
+ ];
+ $("hotelList").innerHTML=stays.map(([name,emoji,rate])=>{
+  const cost=rate*Math.ceil(trip.people/2)*Math.max(0,trip.days-1);
+  return `<article class="hotel">
+   <div class="hotel-photo">${emoji}</div>
+   <div class="hotel-body">
+    <h4>${name}</h4>
+    <div class="price">${rupee(rate)}<small style="display:inline"> / room / night</small></div>
+    <small>Estimated stay total: ${rupee(cost)}</small>
+    <span class="badge">${cost<=budget?"Compare availability":"May exceed budget"}</span>
+   </div>
+  </article>`;
+ }).join("");
+
+ $("placeGrid").innerHTML=currentPlaces.slice(0,4).map((place,index)=>`
+  <article class="place-card">
+   <div class="place-emoji">${place.emoji}</div>
+   <h4>${place.name}</h4>
+   <p>Suggested time: ${place.time}<br>Entry estimate: ${rupee(place.fee)} / person</p>
+   <button onclick="showAlternative(${index})">↗ Find Alternative</button>
+  </article>`).join("");
+
+ let itinerary="";
+ for(let day=1;day<=trip.days;day++){
+  const list=day===1?currentPlaces.slice(0,2):
+   day===2?currentPlaces.slice(2,4):currentPlaces.slice().reverse().slice(0,2);
+  itinerary+=`<div class="itinerary-day">
+   <div class="day-chip">DAY ${day}<small>${day===1?"Explore":"Discover"}</small></div>
+   <div>
+    ${list.map(place=>`<div class="event"><time>${place.time}</time><div><b>${place.name}</b><small>${place.duration} suggested visit</small></div></div>`).join("")}
+    <div class="event"><time>Break</time><div><b>Food & travel time</b><small>Leave a buffer between stops</small></div></div>
+   </div>
+  </div>`;
+ }
+ $("itinerary").innerHTML=itinerary;
+
+ $("tips").innerHTML=`<ul>
+  <li>Check official opening times, weather and road conditions before leaving.</li>
+  <li>Confirm hotel reviews, location, cancellation terms and final price before booking.</li>
+  <li>Keep emergency money and share your route with family.</li>
+  <li>Sample costs and suggested times are not live verified information.</li>
+ </ul>`;
+
+ $("crowd").value="normal";
+ renderCrowd();
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function showAlternative(index){
+ const place=currentPlaces[index];
+ showToast("Alternative idea: "+place.alt+". Check distance, opening hours and local conditions before going.");
+}
+
+function renderCrowd(){
+ if(!trip.dest)return;
+ const value=$("crowd").value;
+ const place=currentPlaces.find(p=>p.name.toLowerCase().includes("guna"))||currentPlaces[0];
+ const box=$("crowdResult");
+ if(value==="normal"){
+  box.style.background="#edfaf3";
+  box.style.borderColor="#c8efd9";
+  box.innerHTML='<div class="big">🟢</div><div><h4>Normal conditions · demo</h4><p>No simulated alert right now. Verify local conditions before travelling.</p></div>';
+ }else if(value==="busy"){
+  box.style.background="#fff7ed";
+  box.style.borderColor="#ffdfb9";
+  box.innerHTML=`<div class="big">🚦</div><div><h4>Heavy crowd · demo alert</h4><p>Consider ${place.alt} instead, or try this place at a less busy time if it is open.</p></div>`;
+ }else{
+  box.style.background="#fff0f0";
+  box.style.borderColor="#ffd0d0";
+  box.innerHTML=`<div class="big">⛔</div><div><h4>Access unavailable · demo</h4><p>Do not travel until access is confirmed. Alternative idea: ${place.alt}.</p></div>`;
+ }
+}
+
+$("startForm").addEventListener("submit",buildTrip);
+$("crowd").addEventListener("change",renderCrowd);
+
+$("editTrip").addEventListener("click",()=>{
+ $("app").classList.add("hidden");
+ $("landing").classList.remove("hidden");
+ window.scrollTo({top:0,behavior:"smooth"});
+});
+
+document.querySelectorAll(".navbtn").forEach(button=>{
+ button.addEventListener("click",()=>{
+  document.querySelectorAll(".navbtn").forEach(item=>item.classList.remove("active"));
+  button.classList.add("active");
+  const section=$(button.dataset.section);
+  if(section)section.scrollIntoView({behavior:"smooth",block:"start"});
+ });
+});
+</script>
+</body>
+</html>
